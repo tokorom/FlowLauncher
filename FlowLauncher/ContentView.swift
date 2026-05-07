@@ -41,7 +41,7 @@ struct ContentView: View {
         .navigationTitle("Flow")
         .frame(minWidth: 420, minHeight: 360)
         .background(
-            KeyCaptureView { event in
+            KeyCaptureView(isEnabled: !isAddingApp) { event in
                 store.launch(matching: event)
             }
         )

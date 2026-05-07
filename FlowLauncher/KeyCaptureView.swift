@@ -9,21 +9,30 @@ import AppKit
 import SwiftUI
 
 struct KeyCaptureView: NSViewRepresentable {
+    var isEnabled = true
     var onKeyDown: (NSEvent) -> Bool
 
     func makeNSView(context: Context) -> KeyCaptureNSView {
         let view = KeyCaptureNSView()
+        view.isEnabled = isEnabled
         view.onKeyDown = onKeyDown
         return view
     }
 
     func updateNSView(_ nsView: KeyCaptureNSView, context: Context) {
+        nsView.isEnabled = isEnabled
         nsView.onKeyDown = onKeyDown
+
+        if isEnabled {
+            nsView.reclaimFocus()
+        }
     }
 }
 
 final class KeyCaptureNSView: NSView {
+    var isEnabled = true
     var onKeyDown: ((NSEvent) -> Bool)?
+    private var localKeyDownMonitor: Any?
 
     override var acceptsFirstResponder: Bool {
         true
@@ -32,6 +41,16 @@ final class KeyCaptureNSView: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
 
+        if window == nil {
+            removeLocalKeyDownMonitor()
+            return
+        }
+
+        installLocalKeyDownMonitorIfNeeded()
+        reclaimFocus()
+    }
+
+    func reclaimFocus() {
         Task { @MainActor in
             window?.makeFirstResponder(self)
         }
@@ -47,5 +66,33 @@ final class KeyCaptureNSView: NSView {
             super.keyDown(with: event)
             return
         }
+    }
+
+    private func installLocalKeyDownMonitorIfNeeded() {
+        guard localKeyDownMonitor == nil else {
+            return
+        }
+
+        localKeyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            guard let self else {
+                return event
+            }
+
+            guard self.isEnabled,
+                  event.window == self.window else {
+                return event
+            }
+
+            return self.onKeyDown?(event) == true ? nil : event
+        }
+    }
+
+    private func removeLocalKeyDownMonitor() {
+        guard let localKeyDownMonitor else {
+            return
+        }
+
+        NSEvent.removeMonitor(localKeyDownMonitor)
+        self.localKeyDownMonitor = nil
     }
 }
