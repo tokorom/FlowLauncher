@@ -10,7 +10,7 @@ build_number_key := "APP_BUILD_NUMBER"
 marketing_version_key := "APP_VERSION"
 
 github_release_script := "./scripts/github_release.zsh"
-github_repo := "tokorom/PromptFlow"
+github_repo := "tokorom/FlowLauncher"
 github_token := "${GITHUB_TOKEN}"
 
 archive_script := "./scripts/archive"
@@ -28,7 +28,7 @@ deploy:
 	git commit -m "Bump up app version to $(marketing_version) ($(build_number))" || true
 	git push origin @
 	$(archive_script)
-	zsh -c "source $(github_release_script) && github_release $(github_repo) $(marketing_version) $(github_token) $(changelog) ./build/PromptFlow-$(marketing_version).dmg"
+	zsh -c "source $(github_release_script) && github_release $(github_repo) $(marketing_version) $(github_token) $(changelog) ./build/FlowLauncher-$(marketing_version).dmg"
 	git ls-remote --exit-code . origin/$(deploy_branch) && git push origin --delete $(deploy_branch) || true
 	git push origin HEAD:$(deploy_branch)
 help:
@@ -37,6 +37,6 @@ help:
 	@echo "  make deploy_to_xcode_cloud bump_type=minor"
 	@echo "  make deploy_to_xcode_cloud bump_type=major"
 lint:
-	swift format lint --recursive app
+	swift format lint --recursive FlowLauncher
 format:
-	swift format format --recursive --in-place app
+	swift format format --recursive --in-place FlowLauncher
