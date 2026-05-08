@@ -5,6 +5,7 @@
 //  Created by Yuta Tokoro on 2026/05/07.
 //
 
+import AppKit
 import SwiftUI
 
 @main
@@ -38,7 +39,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Find the main window and disable its close button
         DispatchQueue.main.async {
             if let window = NSApp.windows.first(where: { $0.title == "Flow" }) {
-                window.standardButton(.closeButton)?.isEnabled = false
+                window.styleMask.remove(.closable)
             }
         }
     }
