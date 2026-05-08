@@ -41,11 +41,11 @@ class SettingsManager {
 
     var hotkeyModifier: ModifierKey {
         get {
-            access(keypath: \.hotkeyModifier)
+            access(keyPath: \.hotkeyModifier)
             return ModifierKey(rawValue: UserDefaults.standard.string(forKey: "hotkeyModifier") ?? "") ?? .control
         }
         set {
-            withMutation(keypath: \.hotkeyModifier) {
+            withMutation(keyPath: \.hotkeyModifier) {
                 UserDefaults.standard.set(newValue.rawValue, forKey: "hotkeyModifier")
             }
         }
@@ -53,11 +53,11 @@ class SettingsManager {
 
     var launchAtLogin: Bool {
         get {
-            access(keypath: \.launchAtLogin)
+            access(keyPath: \.launchAtLogin)
             return UserDefaults.standard.bool(forKey: "launchAtLogin")
         }
         set {
-            withMutation(keypath: \.launchAtLogin) {
+            withMutation(keyPath: \.launchAtLogin) {
                 UserDefaults.standard.set(newValue, forKey: "launchAtLogin")
                 updateLaunchAtLogin(newValue)
             }
