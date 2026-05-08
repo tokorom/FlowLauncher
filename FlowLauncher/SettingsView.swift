@@ -10,16 +10,12 @@ struct SettingsView: View {
         @Bindable var settings = SettingsManager.shared
         Form {
             Section {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Text("Flow")
-                            .font(.headline)
-                        Text(settings.appVersion)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    Text("キーを押したら対応したアプリを開くシンプルなランチャー")
-                        .font(.caption)
+                HStack {
+                    Text("Version")
+                        .font(.headline)
+                    Spacer()
+                    Text(settings.appVersion)
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
             }
@@ -27,23 +23,11 @@ struct SettingsView: View {
             Section("起動設定") {
                 Picker("起動ホットキー", selection: $settings.hotkeyModifier) {
                     ForEach(ModifierKey.allCases) { key in
-                        Text("\(key.displayString) の2連打").tag(key)
+                        Text("\(key.displayString), \(key.displayString)").tag(key)
                     }
                 }
-                .help("指定したキーを2回連続で押すとランチャーが開きます。")
 
                 Toggle("ログイン時に自動起動", isOn: $settings.launchAtLogin)
-                    .help("Macの起動時に自動的にFlowを開始します。")
-            }
-
-            Section {
-                Button("Flowを終了", role: .destructive) {
-                    if let delegate = NSApp.delegate as? AppDelegate {
-                        delegate.forceTerminate()
-                    } else {
-                        NSApp.terminate(nil)
-                    }
-                }
             }
         }
         .formStyle(.grouped)

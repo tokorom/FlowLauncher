@@ -38,6 +38,7 @@ struct ContentView: View {
             } label: {
                 Label("アプリを追加", systemImage: "plus")
             }
+            .frame(maxWidth: .infinity)
         }
         .frame(minWidth: 320, minHeight: 200)
         .toolbar(.hidden, for: .windowToolbar)
