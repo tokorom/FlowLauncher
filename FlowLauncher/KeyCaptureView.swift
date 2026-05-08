@@ -79,7 +79,8 @@ final class KeyCaptureNSView: NSView {
             }
 
             guard self.isEnabled,
-                  event.window == self.window else {
+                event.window == self.window
+            else {
                 return event
             }
 

@@ -98,7 +98,8 @@ struct AddLauncherItemView: View {
         panel.treatsFilePackagesAsDirectories = false
 
         guard panel.runModal() == .OK,
-              let url = panel.url else {
+            let url = panel.url
+        else {
             return
         }
 

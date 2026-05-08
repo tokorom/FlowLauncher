@@ -89,9 +89,11 @@ final class LauncherStore: ObservableObject {
 
     private func launch(_ item: LauncherItem) {
         if let bundleIdentifier = item.bundleIdentifier,
-           let runningApplication = NSRunningApplication
-            .runningApplications(withBundleIdentifier: bundleIdentifier)
-            .first {
+            let runningApplication =
+                NSRunningApplication
+                .runningApplications(withBundleIdentifier: bundleIdentifier)
+                .first
+        {
             runningApplication.activate(options: [.activateAllWindows])
             return
         }

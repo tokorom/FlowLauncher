@@ -20,9 +20,11 @@ enum LauncherKey {
             return nil
         }
 
-        guard character.unicodeScalars.allSatisfy({ scalar in
-            !CharacterSet.controlCharacters.contains(scalar)
-        }) else {
+        guard
+            character.unicodeScalars.allSatisfy({ scalar in
+                !CharacterSet.controlCharacters.contains(scalar)
+            })
+        else {
             return nil
         }
 
