@@ -16,6 +16,7 @@ struct FlowLauncherApp: App {
         WindowGroup {
             ContentView()
         }
+        .windowStyle(.hiddenTitleBar)
 
         Settings {
             SettingsView()

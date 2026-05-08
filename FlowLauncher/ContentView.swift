@@ -39,8 +39,8 @@ struct ContentView: View {
                 Label("アプリを追加", systemImage: "plus")
             }
         }
-        .navigationTitle("Flow")
         .frame(minWidth: 420, minHeight: 360)
+        .toolbar(.hidden, for: .windowToolbar)
         .background(
             KeyCaptureView(isEnabled: !isAddingApp) { event in
                 store.launch(matching: event)
