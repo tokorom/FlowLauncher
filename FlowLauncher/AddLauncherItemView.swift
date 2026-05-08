@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 
 struct AddLauncherItemView: View {
     @Environment(\.dismiss) private var dismiss
-    @ObservedObject var store: LauncherStore
+    var store: LauncherStore
 
     @State private var selectedAppURL: URL?
     @State private var keyInput = ""

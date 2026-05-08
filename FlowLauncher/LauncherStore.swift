@@ -6,13 +6,14 @@
 //
 
 import AppKit
-import Combine
 import Foundation
+import Observation
 
 @MainActor
-final class LauncherStore: ObservableObject {
-    @Published private(set) var items: [LauncherItem] = []
-    @Published var lastErrorMessage: String?
+@Observable
+final class LauncherStore {
+    private(set) var items: [LauncherItem] = []
+    var lastErrorMessage: String?
 
     private let fileURL: URL
     private let fileManager: FileManager

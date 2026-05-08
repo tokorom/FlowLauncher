@@ -3,6 +3,7 @@
 //  FlowLauncher
 //
 
+import Observation
 import ServiceManagement
 import SwiftUI
 
@@ -33,21 +34,41 @@ enum ModifierKey: String, CaseIterable, Identifiable {
     }
 }
 
-class SettingsManager: ObservableObject {
+@Observable
+@MainActor
+class SettingsManager {
     static let shared = SettingsManager()
 
-    @AppStorage("hotkeyModifier") var hotkeyModifier: ModifierKey = .control
-    @AppStorage("launchAtLogin") var launchAtLogin: Bool = false {
-        didSet {
-            updateLaunchAtLogin()
+    var hotkeyModifier: ModifierKey {
+        get {
+            access(keypath: \.hotkeyModifier)
+            return ModifierKey(rawValue: UserDefaults.standard.string(forKey: "hotkeyModifier") ?? "") ?? .control
+        }
+        set {
+            withMutation(keypath: \.hotkeyModifier) {
+                UserDefaults.standard.set(newValue.rawValue, forKey: "hotkeyModifier")
+            }
+        }
+    }
+
+    var launchAtLogin: Bool {
+        get {
+            access(keypath: \.launchAtLogin)
+            return UserDefaults.standard.bool(forKey: "launchAtLogin")
+        }
+        set {
+            withMutation(keypath: \.launchAtLogin) {
+                UserDefaults.standard.set(newValue, forKey: "launchAtLogin")
+                updateLaunchAtLogin(newValue)
+            }
         }
     }
 
     private init() {}
 
-    func updateLaunchAtLogin() {
+    private func updateLaunchAtLogin(_ enabled: Bool) {
         do {
-            if launchAtLogin {
+            if enabled {
                 try SMAppService.mainApp.register()
             } else {
                 try SMAppService.mainApp.unregister()

@@ -6,9 +6,8 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @StateObject private var settings = SettingsManager.shared
-
     var body: some View {
+        @Bindable var settings = SettingsManager.shared
         Form {
             Section {
                 VStack(alignment: .leading, spacing: 8) {
