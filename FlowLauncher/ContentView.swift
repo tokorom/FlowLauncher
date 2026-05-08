@@ -18,9 +18,9 @@ struct ContentView: View {
                 ContentUnavailableView(
                     "アプリが未登録です",
                     systemImage: "app.dashed",
-                    description: Text("下の追加ボタンからアプリとキーを登録してください。")
+                    description: Text("下の追加ボタンから登録してください。")
                 )
-                .frame(maxWidth: .infinity, minHeight: 180)
+                .frame(maxWidth: .infinity, minHeight: 120)
             }
 
             ForEach(store.items) { item in
@@ -39,7 +39,7 @@ struct ContentView: View {
                 Label("アプリを追加", systemImage: "plus")
             }
         }
-        .frame(minWidth: 420, minHeight: 360)
+        .frame(minWidth: 320, minHeight: 200)
         .toolbar(.hidden, for: .windowToolbar)
         .background(
             KeyCaptureView(isEnabled: !isAddingApp) { event in
