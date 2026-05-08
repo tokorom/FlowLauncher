@@ -35,6 +35,16 @@ struct SettingsView: View {
                 Toggle("ログイン時に自動起動", isOn: $settings.launchAtLogin)
                     .help("Macの起動時に自動的にFlowを開始します。")
             }
+
+            Section {
+                Button("Flowを終了", role: .destructive) {
+                    if let delegate = NSApp.delegate as? AppDelegate {
+                        delegate.forceTerminate()
+                    } else {
+                        NSApp.terminate(nil)
+                    }
+                }
+            }
         }
         .formStyle(.grouped)
         .frame(width: 400, height: 300)

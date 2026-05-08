@@ -64,6 +64,9 @@ struct ContentView: View {
         } message: {
             Text(store.lastErrorMessage ?? "")
         }
+        .onExitCommand {
+            NSApp.hide(nil)
+        }
     }
 }
 
