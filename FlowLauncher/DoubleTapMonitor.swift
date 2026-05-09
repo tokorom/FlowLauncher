@@ -17,41 +17,49 @@ class DoubleTapMonitor {
     }
 
     private func setupMonitor() {
-        // Global monitor for when the app is in background
-        NSEvent.addGlobalMonitorForEvents(matching: [.flagsChanged, .keyDown]) { [weak self] event in
-            self?.handleEvent(event)
+        // Global monitors
+        NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+            self?.handleFlagsChanged(event)
+        }
+        NSEvent.addGlobalMonitorForEvents(matching: [.keyDown, .leftMouseDown, .rightMouseDown, .otherMouseDown]) { [weak self] _ in
+            self?.reset()
         }
 
-        // Local monitor for when the app is in foreground
-        NSEvent.addLocalMonitorForEvents(matching: [.flagsChanged, .keyDown]) { [weak self] event in
-            self?.handleEvent(event)
+        // Local monitors
+        NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+            self?.handleFlagsChanged(event)
+            return event
+        }
+        NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .leftMouseDown, .rightMouseDown, .otherMouseDown]) { [weak self] event in
+            self?.reset()
             return event
         }
     }
 
-    private func handleEvent(_ event: NSEvent) {
-        if event.type == .keyDown {
-            // Any key press invalidates the double-tap sequence
-            lastEventTime = 0
-            return
-        }
+    private func reset() {
+        lastEventTime = 0
+    }
 
-        if event.type == .flagsChanged {
-            let targetModifier = SettingsManager.shared.hotkeyModifier.modifierFlags
-            let currentFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+    private func handleFlagsChanged(_ event: NSEvent) {
+        let targetModifier = SettingsManager.shared.hotkeyModifier.modifierFlags
+        let currentFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
-            // Check if the target modifier was just pressed (and no other modifiers are active)
-            if currentFlags == targetModifier && !lastModifierFlags.contains(targetModifier) {
+        // Check if the target modifier was just pressed (and no other modifiers are active)
+        if currentFlags == targetModifier {
+            if !lastModifierFlags.contains(targetModifier) {
                 let currentTime = ProcessInfo.processInfo.systemUptime
                 if currentTime - lastEventTime < threshold {
                     onDoubleTap()
-                    lastEventTime = 0  // Reset after trigger
+                    reset()
                 } else {
                     lastEventTime = currentTime
                 }
             }
-
-            lastModifierFlags = currentFlags
+        } else if currentFlags != [] {
+            // Any other modifier combination resets the state
+            reset()
         }
+
+        lastModifierFlags = currentFlags
     }
 }
