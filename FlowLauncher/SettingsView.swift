@@ -34,7 +34,7 @@ struct SettingsView: View {
                 Button(role: .destructive) {
                     NSApplication.shared.terminate(nil)
                 } label: {
-                    Text("FlowLauncherを終了")
+                    Text("Quit FlowLauncher")
                         .frame(maxWidth: .infinity)
                 }
             }
