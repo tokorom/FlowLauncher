@@ -29,6 +29,15 @@ struct SettingsView: View {
 
                 Toggle("ログイン時に自動起動", isOn: $settings.launchAtLogin)
             }
+
+            Section {
+                Button(role: .destructive) {
+                    NSApplication.shared.terminate(nil)
+                } label: {
+                    Text("FlowLauncherを終了")
+                        .frame(maxWidth: .infinity)
+                }
+            }
         }
         .formStyle(.grouped)
         .frame(width: 400, height: 300)
