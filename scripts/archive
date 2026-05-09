@@ -6,7 +6,7 @@ set -e
 XCCONFIG="Version.xcconfig"
 PROJECT="FlowLauncher.xcodeproj"
 SCHEME="FlowLauncher"
-BUILD_DIR="build"
+BUILD_DIR=".build"
 ARCHIVE_PATH="$BUILD_DIR/FlowLauncher.xcarchive"
 APP_PATH="$ARCHIVE_PATH/Products/Applications/FlowLauncher.app"
 
