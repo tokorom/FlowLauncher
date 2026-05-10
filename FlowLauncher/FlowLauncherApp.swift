@@ -69,8 +69,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func activateApp() {
         NSApp.activate(ignoringOtherApps: true)
-        // If the window is closed or hidden, we might need to make it visible
-        if let window = NSApp.windows.first {
+
+        // Find the main window (identified by title "Flow" or just the first non-settings window)
+        let mainWindow = NSApp.windows.first { window in
+            window.title == "Flow" || !(window.contentViewController is NSHostingController<SettingsView>)
+        }
+
+        if let window = mainWindow {
             window.makeKeyAndOrderFront(nil)
         }
     }
