@@ -32,7 +32,9 @@ struct SettingsView: View {
 
             Section {
                 Button(role: .destructive) {
-                    NSApplication.shared.terminate(nil)
+                    if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+                        appDelegate.forceTerminate()
+                    }
                 } label: {
                     Text("Quit FlowLauncher")
                         .frame(maxWidth: .infinity)
