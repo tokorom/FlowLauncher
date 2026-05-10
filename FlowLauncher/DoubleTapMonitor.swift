@@ -41,8 +41,8 @@ class DoubleTapMonitor {
     }
 
     private func handleFlagsChanged(_ event: NSEvent) {
-        let targetModifier = SettingsManager.shared.hotkeyModifier.modifierFlags
         let currentFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        let targetModifier = SettingsManager.shared.hotkeyModifier.modifierFlags
 
         // Check if the target modifier was just pressed (and no other modifiers are active)
         if currentFlags == targetModifier {
@@ -55,7 +55,7 @@ class DoubleTapMonitor {
                     lastEventTime = currentTime
                 }
             }
-        } else if currentFlags != [] {
+        } else if !currentFlags.isEmpty {
             // Any other modifier combination resets the state
             reset()
         }
