@@ -8,10 +8,6 @@
 import AppKit
 import SwiftUI
 
-extension Notification.Name {
-    static let showMainWindow = Notification.Name("showMainWindow")
-}
-
 @main
 struct FlowLauncherApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -20,10 +16,6 @@ struct FlowLauncherApp: App {
     var body: some Scene {
         WindowGroup(id: "main") {
             ContentView()
-                .onReceive(NotificationCenter.default.publisher(for: .showMainWindow)) { _ in
-                    // This will be received by any existing window.
-                    // If no window exists, we need another way to open it.
-                }
         }
         .windowStyle(.hiddenTitleBar)
 
@@ -76,9 +68,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return .terminateNow
         }
 
-        // Cmd+Q closes the active window instead of quitting the app
+        // Cmd+Q hides the active window instead of quitting the app.
+        // We use orderOut instead of close to keep the window in memory so it can be reopened quickly.
         if let window = NSApp.keyWindow {
-            window.close()
+            window.orderOut(nil)
         }
 
         return .terminateCancel
@@ -92,24 +85,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func activateApp() {
         NSApp.activate(ignoringOtherApps: true)
 
+        // Try to find the main window by title "Flow" first.
+        // In SwiftUI, the main WindowGroup window usually has the app's display name as its title.
         let mainWindow = NSApp.windows.first { window in
             window.title == "Flow"
         } ?? NSApp.windows.first { window in
-            !window.title.contains("Settings") && window.canBecomeKey
+            // Fallback: search for a window that is likely NOT the settings window.
+            let t = window.title
+            return !t.contains("Settings") && !t.contains("Preferences") && !t.contains("設定") && window.canBecomeKey
         }
 
         if let window = mainWindow {
             window.makeKeyAndOrderFront(nil)
         } else {
-            // If no window is found, we use AppleScript to simulate a click on the Dock icon,
-            // which is the most reliable way to trigger SwiftUI's WindowGroup re-opening 
-            // when LSUIElement is involved and all windows are closed.
-            let script = "tell application \"System Events\" to tell process \"FlowLauncher\" to click UI element 1 of list 1 of application process \"Dock\""
-            if let appleScript = NSAppleScript(source: script) {
-                appleScript.executeAndReturnError(nil)
-            }
-            
-            // Fallback to standard reopen
+            // If no window is found, trigger a reopen event which should show the main WindowGroup.
             NSApp.delegate?.applicationShouldHandleReopen?(NSApp, hasVisibleWindows: false)
         }
     }
