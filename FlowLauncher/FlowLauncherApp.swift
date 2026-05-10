@@ -70,9 +70,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func activateApp() {
         NSApp.activate(ignoringOtherApps: true)
 
-        // Find the main window (identified by title "Flow" or just the first non-settings window)
+        // The settings window in SwiftUI usually has "Settings" or the app name + " Settings" as title.
+        // The main window's title is set to "Flow" in the project settings.
         let mainWindow = NSApp.windows.first { window in
-            window.title == "Flow" || !(window.contentViewController is NSHostingController<SettingsView>)
+            window.title == "Flow"
+        } ?? NSApp.windows.first { window in
+            // Fallback: search for a window that is likely NOT the settings window
+            !window.title.contains("Settings") && window.canBecomeKey
         }
 
         if let window = mainWindow {
