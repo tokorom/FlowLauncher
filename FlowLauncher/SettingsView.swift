@@ -32,7 +32,7 @@ struct SettingsView: View {
 
             Section {
                 Button(role: .destructive) {
-                    if let appDelegate = NSApplication.shared.delegate as? AppDelegate {
+                    if let appDelegate = AppDelegate.instance {
                         appDelegate.forceTerminate()
                     }
                 } label: {

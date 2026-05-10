@@ -25,10 +25,14 @@ struct FlowLauncherApp: App {
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
+    static var instance: AppDelegate?
+
     private var doubleTapMonitor: DoubleTapMonitor?
     private var isTerminating = false
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        Self.instance = self
+
         doubleTapMonitor = DoubleTapMonitor {
             self.activateApp()
         }
