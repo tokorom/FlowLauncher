@@ -8,13 +8,22 @@
 import AppKit
 import SwiftUI
 
+extension Notification.Name {
+    static let showMainWindow = Notification.Name("showMainWindow")
+}
+
 @main
 struct FlowLauncherApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @Environment(\.openWindow) private var openWindow
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "main") {
             ContentView()
+                .onReceive(NotificationCenter.default.publisher(for: .showMainWindow)) { _ in
+                    // This will be received by any existing window.
+                    // If no window exists, we need another way to open it.
+                }
         }
         .windowStyle(.hiddenTitleBar)
 
@@ -42,9 +51,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if !flag {
-            // If no windows are visible (or they were all closed),
-            // we want SwiftUI to recreate the WindowGroup.
-            // Returning true tells SwiftUI to perform its default reopen behavior.
+            // Trigger SwiftUI to show the window. 
+            // For SwiftUI apps, if we return true, it usually re-opens the main window group.
             return true
         }
         return true
@@ -53,9 +61,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func setupMainWindow() {
         // Find the main window and disable its close button
         DispatchQueue.main.async {
-            if let window = NSApp.windows.first(where: { $0.title == "Flow" }) {
-                window.styleMask.remove(.closable)
-            }
+            self.applyWindowSettings()
+        }
+    }
+
+    private func applyWindowSettings() {
+        if let window = NSApp.windows.first(where: { $0.title == "Flow" }) {
+            window.styleMask.remove(.closable)
         }
     }
 
@@ -89,9 +101,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let window = mainWindow {
             window.makeKeyAndOrderFront(nil)
         } else {
-            // If no window is found (it was closed), reopen it.
-            // For a SwiftUI app, if the only WindowGroup is closed, we can try to
-            // reopen it by sending a 'reopen' event to the application.
+            // If no window is found, we use AppleScript to simulate a click on the Dock icon,
+            // which is the most reliable way to trigger SwiftUI's WindowGroup re-opening 
+            // when LSUIElement is involved and all windows are closed.
+            let script = "tell application \"System Events\" to tell process \"FlowLauncher\" to click UI element 1 of list 1 of application process \"Dock\""
+            if let appleScript = NSAppleScript(source: script) {
+                appleScript.executeAndReturnError(nil)
+            }
+            
+            // Fallback to standard reopen
             NSApp.delegate?.applicationShouldHandleReopen?(NSApp, hasVisibleWindows: false)
         }
     }
