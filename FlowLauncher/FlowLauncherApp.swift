@@ -40,6 +40,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         setupMainWindow()
     }
 
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag {
+            // If no windows are visible (or they were all closed),
+            // we want SwiftUI to recreate the WindowGroup.
+            // Returning true tells SwiftUI to perform its default reopen behavior.
+            return true
+        }
+        return true
+    }
+
     private func setupMainWindow() {
         // Find the main window and disable its close button
         DispatchQueue.main.async {
@@ -70,17 +80,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func activateApp() {
         NSApp.activate(ignoringOtherApps: true)
 
-        // The settings window in SwiftUI usually has "Settings" or the app name + " Settings" as title.
-        // The main window's title is set to "Flow" in the project settings.
         let mainWindow = NSApp.windows.first { window in
             window.title == "Flow"
         } ?? NSApp.windows.first { window in
-            // Fallback: search for a window that is likely NOT the settings window
             !window.title.contains("Settings") && window.canBecomeKey
         }
 
         if let window = mainWindow {
             window.makeKeyAndOrderFront(nil)
+        } else {
+            // If no window is found (it was closed), reopen it.
+            // For a SwiftUI app, if the only WindowGroup is closed, we can try to
+            // reopen it by sending a 'reopen' event to the application.
+            NSApp.delegate?.applicationShouldHandleReopen?(NSApp, hasVisibleWindows: false)
         }
     }
 }
