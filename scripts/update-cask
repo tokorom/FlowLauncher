@@ -63,13 +63,13 @@ if git diff --quiet -- "$CASK_FILE"; then
   exit 0
 fi
 
-echo
-echo "Running brew audit..."
-brew audit --cask "$CASK_NAME"
-
 git add "$CASK_FILE"
 git commit -m "Update ${CASK_NAME} to ${VERSION}"
 git push
+
+echo
+echo "Running brew audit..."
+brew audit --cask "$CASK_NAME"
 
 echo
 echo "Done."
