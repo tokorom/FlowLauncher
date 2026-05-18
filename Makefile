@@ -5,11 +5,11 @@ SHELL := /bin/zsh
 bump_type=minor
 deploy_branch=deploy
 
-app_dir := "FlowLauncher"
-github_repo := "tokorom/$(app_dir)"
+app_name := "FlowLauncher"
+github_repo := "tokorom/$(app_name)"
 github_token := "${GITHUB_TOKEN}"
 
-cask_name := "flowlauncher"
+cask_name := lowercase(app_name)
 cask_repo := "tokorom/homebrew-tap"
 
 changelog := "./Changelog.txt"
@@ -38,7 +38,7 @@ bump_version:
 	git push origin @
 
 deploy: bump_version
-	$(eval DMG_PATH := $(shell $(archive_script)))
+	$(eval DMG_PATH := $(shell $(archive_script) $(app_name)))
 	zsh -c "source $(github_release_script) && github_release $(github_repo) $(marketing_version) $(github_token) $(changelog) $(DMG_PATH)"
 	git ls-remote --exit-code . origin/$(deploy_branch) && git push origin --delete $(deploy_branch) || true
 	git push origin HEAD:$(deploy_branch)
@@ -51,7 +51,7 @@ help:
 	@echo "  make deploy bump_type=major"
 
 lint:
-	xcrun swift-format lint --recursive $(app_dir)
+	xcrun swift-format lint --recursive $(app_name)
 
 format:
-	xcrun swift-format format --recursive --in-place $(app_dir)
+	xcrun swift-format format --recursive --in-place $(app_name)

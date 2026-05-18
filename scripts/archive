@@ -2,8 +2,14 @@
 
 set -euo pipefail
 
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $0 <APP_NAME>" >&2
+  exit 1
+fi
+
+APP_NAME="$1"
+
 # Configuration
-APP_NAME="PromptTap"
 XCCONFIG="Version.xcconfig"
 PROJECT="$APP_NAME.xcodeproj"
 SCHEME="$APP_NAME"
@@ -68,9 +74,9 @@ codesign --force --deep --options runtime \
     --sign "$DEVELOPER_ID" \
     "$APP_PATH" >&2
 
-ditto -c -k --keepParent "$APP_PATH" "$BUILD_DIR/PromptTap.app.zip" >&2
+ditto -c -k --keepParent "$APP_PATH" "$BUILD_DIR/$APP_NAME.app.zip" >&2
 
-xcrun notarytool submit "$BUILD_DIR/PromptTap.app.zip" \
+xcrun notarytool submit "$BUILD_DIR/$APP_NAME.app.zip" \
   --keychain-profile "$NOTARY_PROFILE" \
   --wait >&2
 
