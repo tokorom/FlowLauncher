@@ -118,8 +118,8 @@ echo "Verifying app inside DMG..." >&2
 codesign -dv --verbose=4 "$MOUNT_DIR/$APP_NAME.app" 2>&1 | grep Authority >&2
 spctl -a -vvv "$MOUNT_DIR/$APP_NAME.app" >&2
 
-hdiutil detach "$MOUNT_DIR" -quiet
-rmdir "$MOUNT_DIR"
+hdiutil detach "$MOUNT_DIR" -quiet >&2
+rmdir "$MOUNT_DIR" >&2
 
 # 7. Sign DMG with Developer ID
 echo "Signing DMG..." >&2
