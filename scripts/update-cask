@@ -41,7 +41,8 @@ cd "$WORK_DIR/homebrew-tap"
 CASK_FILE="Casks/${CASK_NAME}.rb"
 
 if [ ! -f "$CASK_FILE" ]; then
-  touch "$CASK_FILE"
+  echo "Cask file not found: $CASK_FILE"
+  exit 1
 fi
 
 echo "Updating $CASK_FILE"
