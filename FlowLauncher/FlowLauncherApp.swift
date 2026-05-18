@@ -43,7 +43,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if !flag {
-            // Trigger SwiftUI to show the window. 
+            // Trigger SwiftUI to show the window.
             // For SwiftUI apps, if we return true, it usually re-opens the main window group.
             return true
         }
@@ -87,13 +87,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Try to find the main window by title "Flow" first.
         // In SwiftUI, the main WindowGroup window usually has the app's display name as its title.
-        let mainWindow = NSApp.windows.first { window in
-            window.title == "Flow"
-        } ?? NSApp.windows.first { window in
-            // Fallback: search for a window that is likely NOT the settings window.
-            let t = window.title
-            return !t.contains("Settings") && !t.contains("Preferences") && !t.contains("設定") && window.canBecomeKey
-        }
+        let mainWindow =
+            NSApp.windows.first { window in
+                window.title == "Flow"
+            }
+            ?? NSApp.windows.first { window in
+                // Fallback: search for a window that is likely NOT the settings window.
+                let t = window.title
+                return !t.contains("Settings") && !t.contains("Preferences") && !t.contains("設定") && window.canBecomeKey
+            }
 
         if let window = mainWindow {
             window.makeKeyAndOrderFront(nil)
