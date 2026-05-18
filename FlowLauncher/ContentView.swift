@@ -44,7 +44,11 @@ struct ContentView: View {
         .toolbar(.hidden, for: .windowToolbar)
         .background(
             KeyCaptureView(isEnabled: !isAddingApp) { event in
-                store.launch(matching: event)
+                if store.launch(matching: event) {
+                    NSApp.hide(nil)
+                    return true
+                }
+                return false
             }
         )
         .sheet(isPresented: $isAddingApp) {

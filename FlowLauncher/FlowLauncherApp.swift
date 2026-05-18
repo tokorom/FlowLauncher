@@ -101,7 +101,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             window.makeKeyAndOrderFront(nil)
         } else {
             // If no window is found, trigger a reopen event which should show the main WindowGroup.
-            NSApp.delegate?.applicationShouldHandleReopen?(NSApp, hasVisibleWindows: false)
+            _ = NSApp.delegate?.applicationShouldHandleReopen?(NSApp, hasVisibleWindows: false)
         }
     }
 }
