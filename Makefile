@@ -9,7 +9,7 @@ app_name := "FlowLauncher"
 github_repo := "tokorom/$(app_name)"
 github_token := "${GITHUB_TOKEN}"
 
-cask_name="${app_name:l}"
+cask_name := $(shell echo $(app_name) | tr '[:upper:]' '[:lower:]')
 cask_repo := "tokorom/homebrew-tap"
 
 changelog := "./Changelog.txt"
