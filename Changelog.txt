@@ -1,1 +1,3 @@
-- アプリ決定でウィンドウを閉じる
+### Added
+- Trigger hotkey only when the modifier key is released without other key presses.
+
