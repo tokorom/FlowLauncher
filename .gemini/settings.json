@@ -1,6 +1,6 @@
 {
   "tools": {
-    "core": [
+    "allowed": [
       "run_shell_command(git)",
       "run_shell_command(xcodebuild)",
       "run_shell_command(pwd)",
