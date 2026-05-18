@@ -69,6 +69,7 @@ git push
 
 echo
 echo "Running brew audit..."
+brew update
 brew audit --cask "$CASK_NAME"
 
 echo
