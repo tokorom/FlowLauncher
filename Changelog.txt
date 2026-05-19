@@ -1,3 +1,2 @@
 ### Added
-- Fix scripts
-
+- Feature to hide the main window when the hotkey is triggered while the app is active.
