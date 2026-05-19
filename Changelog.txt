@@ -1,2 +1,2 @@
-### Added
-- Feature to hide the main window when the hotkey is triggered while the app is active.
+### Fixed
+- Issue where the main window would not reliably come to the foreground after launching an app.
