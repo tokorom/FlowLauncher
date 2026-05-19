@@ -1,2 +1,5 @@
+### Added
+- Added `Cmd+W` shortcut to hide the app window
+
 ### Fixed
-- Issue where the main window would not reliably come to the foreground after launching an app.
+- Unified window hiding logic to resolve Hotkey visibility inconsistency
