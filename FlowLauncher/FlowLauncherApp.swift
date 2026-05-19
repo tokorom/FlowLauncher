@@ -18,6 +18,14 @@ struct FlowLauncherApp: App {
             ContentView()
         }
         .windowStyle(.hiddenTitleBar)
+        .commands {
+            CommandGroup(replacing: .windowSize) {
+                Button("ウィンドウを閉じる") {
+                    AppDelegate.instance?.hideApp()
+                }
+                .keyboardShortcut("w", modifiers: .command)
+            }
+        }
 
         Settings {
             SettingsView()
@@ -70,9 +78,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         // Cmd+Q hides the active window instead of quitting the app.
         // We use orderOut instead of close to keep the window in memory so it can be reopened quickly.
-        if let window = NSApp.keyWindow {
-            window.orderOut(nil)
-        }
+        hideApp()
 
         return .terminateCancel
     }
@@ -82,11 +88,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.terminate(nil)
     }
 
+    func hideApp() {
+        if let window = findMainWindow() {
+            window.orderOut(nil)
+        }
+    }
+
     private func activateApp() {
         let mainWindow = findMainWindow()
 
         if let window = mainWindow, NSApp.isActive && window.isVisible && window.isKeyWindow {
-            window.orderOut(nil)
+            hideApp()
             return
         }
 

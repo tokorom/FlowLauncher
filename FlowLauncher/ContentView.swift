@@ -45,7 +45,7 @@ struct ContentView: View {
         .background(
             KeyCaptureView(isEnabled: !isAddingApp) { event in
                 if store.launch(matching: event) {
-                    NSApp.hide(nil)
+                    AppDelegate.instance?.hideApp()
                     return true
                 }
                 return false
@@ -70,7 +70,7 @@ struct ContentView: View {
             Text(store.lastErrorMessage ?? "")
         }
         .onExitCommand {
-            NSApp.hide(nil)
+            AppDelegate.instance?.hideApp()
         }
     }
 }
