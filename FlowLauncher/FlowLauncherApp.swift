@@ -58,7 +58,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func applyWindowSettings() {
-        if let window = NSApp.windows.first(where: { $0.title == "Flow" }) {
+        if let window = findMainWindow() {
             window.styleMask.remove(.closable)
         }
     }
@@ -83,25 +83,33 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func activateApp() {
-        NSApp.activate(ignoringOtherApps: true)
+        let mainWindow = findMainWindow()
 
-        // Try to find the main window by title "Flow" first.
-        // In SwiftUI, the main WindowGroup window usually has the app's display name as its title.
-        let mainWindow =
-            NSApp.windows.first { window in
-                window.title == "Flow"
-            }
-            ?? NSApp.windows.first { window in
-                // Fallback: search for a window that is likely NOT the settings window.
-                let t = window.title
-                return !t.contains("Settings") && !t.contains("Preferences") && !t.contains("設定") && window.canBecomeKey
-            }
+        if let window = mainWindow, NSApp.isActive && window.isKeyWindow {
+            window.orderOut(nil)
+            return
+        }
+
+        NSApp.activate(ignoringOtherApps: true)
 
         if let window = mainWindow {
             window.makeKeyAndOrderFront(nil)
         } else {
             // If no window is found, trigger a reopen event which should show the main WindowGroup.
             _ = NSApp.delegate?.applicationShouldHandleReopen?(NSApp, hasVisibleWindows: false)
+        }
+    }
+
+    private func findMainWindow() -> NSWindow? {
+        // Try to find the main window by title "Flow" first.
+        // In SwiftUI, the main WindowGroup window usually has the app's display name as its title.
+        return NSApp.windows.first { window in
+            window.title == "Flow"
+        }
+        ?? NSApp.windows.first { window in
+            // Fallback: search for a window that is likely NOT the settings window.
+            let t = window.title
+            return !t.contains("Settings") && !t.contains("Preferences") && !t.contains("設定") && window.canBecomeKey
         }
     }
 }
