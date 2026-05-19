@@ -8,7 +8,6 @@ import AppKit
 class DoubleTapMonitor {
     private var lastReleaseTime: TimeInterval = 0
     private var isWaitingForSecondRelease = false
-    private var isInvalidated = false
     private var lastModifierFlags: NSEvent.ModifierFlags = []
     private let threshold: TimeInterval = 0.4
     private let onDoubleTap: () -> Void
@@ -24,7 +23,7 @@ class DoubleTapMonitor {
             self?.handleFlagsChanged(event)
         }
         NSEvent.addGlobalMonitorForEvents(matching: [.keyDown, .leftMouseDown, .rightMouseDown, .otherMouseDown]) { [weak self] _ in
-            self?.invalidate()
+            self?.reset()
         }
 
         // Local monitors
@@ -33,7 +32,7 @@ class DoubleTapMonitor {
             return event
         }
         NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .leftMouseDown, .rightMouseDown, .otherMouseDown]) { [weak self] event in
-            self?.invalidate()
+            self?.reset()
             return event
         }
     }
@@ -41,13 +40,6 @@ class DoubleTapMonitor {
     private func reset() {
         lastReleaseTime = 0
         isWaitingForSecondRelease = false
-        isInvalidated = false
-    }
-
-    private func invalidate() {
-        lastReleaseTime = 0
-        isWaitingForSecondRelease = false
-        isInvalidated = true
     }
 
     private func handleFlagsChanged(_ event: NSEvent) {
@@ -57,11 +49,9 @@ class DoubleTapMonitor {
         if currentFlags == targetModifier {
             // Target modifier pressed (and it's the only one)
             if !lastModifierFlags.contains(targetModifier) {
-                if !isInvalidated {
-                    let currentTime = ProcessInfo.processInfo.systemUptime
-                    if currentTime - lastReleaseTime < threshold {
-                        isWaitingForSecondRelease = true
-                    }
+                let currentTime = ProcessInfo.processInfo.systemUptime
+                if currentTime - lastReleaseTime < threshold {
+                    isWaitingForSecondRelease = true
                 }
             }
         } else if currentFlags.isEmpty {
@@ -70,14 +60,12 @@ class DoubleTapMonitor {
                 if isWaitingForSecondRelease {
                     onDoubleTap()
                     reset()
-                } else if !isInvalidated {
+                } else {
                     lastReleaseTime = ProcessInfo.processInfo.systemUptime
                 }
             }
-            isInvalidated = false
-        } else if !currentFlags.isEmpty {
-            // Other modifiers pressed
-            invalidate()
+        } else {
+            reset()
         }
 
         lastModifierFlags = currentFlags

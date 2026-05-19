@@ -23,6 +23,10 @@ struct FlowLauncherApp: App {
             SettingsView()
         }
     }
+
+    func openMainWindow() {
+        openWindow(id: "main")
+    }
 }
 
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -81,41 +85,40 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func hideApp() {
-        if let window = findMainWindow() {
-            window.orderOut(nil)
-            // Deactivate the app to return focus to the previous application.
-            // This is crucial for the "one-tap" Hotkey behavior later.
-            NSApp.deactivate()
+        guard let window = findMainWindow() else {
+            return
         }
+
+        window.orderOut(nil)
     }
 
     private func shouldSendToFront() -> Bool {
         if !NSApp.isActive {
-            return false
+            return true
         }
 
         guard let window = findMainWindow() else {
-            return false
+            return true
         }
 
-        if window.isOnActiveSpace {
-            return false
+        if !window.isOnActiveSpace {
+            return true
         }
 
         if !window.isVisible {
-            return false
+            return true
         }
 
         if !window.isKeyWindow {
-            return false
+            return true
         }
 
-        return true
+        return false
     }
 
     private func sendToFront() {
         guard let window = findMainWindow() else {
-            _ = NSApp.delegate?.applicationShouldHandleReopen?(NSApp, hasVisibleWindows: false)
+            openMainWindow()
             return
         }
 
@@ -144,5 +147,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let t = window.title
             return !t.contains("Settings") && !t.contains("Preferences") && !t.contains("設定") && window.canBecomeKey
         }
+    }
+
+    private func openMainWindow() {
+        AppDelegate.instance?.openMainWindow()
     }
 }
