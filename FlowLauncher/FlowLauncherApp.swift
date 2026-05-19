@@ -85,15 +85,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func activateApp() {
         let mainWindow = findMainWindow()
 
-        if let window = mainWindow, NSApp.isActive && window.isKeyWindow {
+        if let window = mainWindow, NSApp.isActive && window.isVisible && window.isKeyWindow {
             window.orderOut(nil)
             return
         }
 
+        NSApp.unhide(nil)
         NSApp.activate(ignoringOtherApps: true)
 
         if let window = mainWindow {
             window.makeKeyAndOrderFront(nil)
+            window.orderFrontRegardless()
         } else {
             // If no window is found, trigger a reopen event which should show the main WindowGroup.
             _ = NSApp.delegate?.applicationShouldHandleReopen?(NSApp, hasVisibleWindows: false)
