@@ -89,23 +89,47 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    private func activateApp() {
-        let mainWindow = findMainWindow()
+    private func shouldSendToFront() -> Bool {
+        if !NSApp.isActive {
+            return false
+        }
 
-        if let window = mainWindow, NSApp.isActive && window.isVisible && window.isKeyWindow {
-            hideApp()
+        guard let window = findMainWindow() else {
+            return false
+        }
+
+        if window.isOnActiveSpace {
+            return false
+        }
+
+        if !window.isVisible {
+            return false
+        }
+
+        if !window.isKeyWindow {
+            return false
+        }
+
+        return true
+    }
+
+    private func sendToFront() {
+        guard let window = findMainWindow() else {
+            _ = NSApp.delegate?.applicationShouldHandleReopen?(NSApp, hasVisibleWindows: false)
             return
         }
 
+        window.collectionBehavior.insert(.moveToActiveSpace)
         NSApp.unhide(nil)
+        window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
 
-        if let window = mainWindow {
-            window.makeKeyAndOrderFront(nil)
-            window.orderFrontRegardless()
+    private func activateApp() {
+        if shouldSendToFront() {
+            sendToFront()
         } else {
-            // If no window is found, trigger a reopen event which should show the main WindowGroup.
-            _ = NSApp.delegate?.applicationShouldHandleReopen?(NSApp, hasVisibleWindows: false)
+            hideApp()
         }
     }
 
