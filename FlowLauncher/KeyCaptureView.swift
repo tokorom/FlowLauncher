@@ -84,6 +84,13 @@ final class KeyCaptureNSView: NSView {
                 return event
             }
 
+            // Explicitly handle Command+W to hide the app
+            if event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
+               event.charactersIgnoringModifiers == "w" {
+                AppDelegate.instance?.hideApp()
+                return nil
+            }
+
             return self.onKeyDown?(event) == true ? nil : event
         }
     }

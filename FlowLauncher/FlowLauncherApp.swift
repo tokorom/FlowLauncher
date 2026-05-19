@@ -18,14 +18,6 @@ struct FlowLauncherApp: App {
             ContentView()
         }
         .windowStyle(.hiddenTitleBar)
-        .commands {
-            CommandGroup(replacing: .windowSize) {
-                Button("ウィンドウを閉じる") {
-                    AppDelegate.instance?.hideApp()
-                }
-                .keyboardShortcut("w", modifiers: .command)
-            }
-        }
 
         Settings {
             SettingsView()
@@ -91,6 +83,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func hideApp() {
         if let window = findMainWindow() {
             window.orderOut(nil)
+            // Deactivate the app to return focus to the previous application.
+            // This is crucial for the "one-tap" Hotkey behavior later.
+            NSApp.deactivate()
         }
     }
 
