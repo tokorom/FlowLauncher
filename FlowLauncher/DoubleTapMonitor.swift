@@ -53,14 +53,22 @@ class DoubleTapMonitor {
             }
         case .firstPressed(let firstPressedTime):
             if currentFlags == targetModifier {
-                hotkeyState = .secondPressed(firstPressedTime: firstPressedTime)
+                if ProcessInfo.processInfo.systemUptime - firstPressedTime < threshold {
+                    hotkeyState = .secondPressed(firstPressedTime: firstPressedTime)
+                } else {
+                    hotkeyState = .firstPressed(firstPressedTime: ProcessInfo.processInfo.systemUptime)
+                }
             } else if !currentFlags.isEmpty {
                 reset()
             }
         case .secondPressed(let firstPressedTime):
-            if currentFlags.isEmpty, ProcessInfo.processInfo.systemUptime - firstPressedTime < threshold {
-                onDoubleTap()
-                reset()
+            if currentFlags.isEmpty {
+                if ProcessInfo.processInfo.systemUptime - firstPressedTime < threshold {
+                    onDoubleTap()
+                    reset()
+                } else {
+                    hotkeyState = .firstPressed(firstPressedTime: ProcessInfo.processInfo.systemUptime)
+                }
             } else {
                 reset()
             }
