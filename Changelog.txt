@@ -1,5 +1,2 @@
-### Added
-- Added `Cmd+W` shortcut to hide the app window
-
 ### Fixed
-- Unified window hiding logic to resolve Hotkey visibility inconsistency
+- Fix the logic of HotKey
