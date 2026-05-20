@@ -6,11 +6,10 @@
 import AppKit
 
 class DoubleTapMonitor {
-    private var lastReleaseTime: TimeInterval = 0
-    private var isWaitingForSecondRelease = false
-    private var lastModifierFlags: NSEvent.ModifierFlags = []
     private let threshold: TimeInterval = 0.4
     private let onDoubleTap: () -> Void
+
+    private var hotkeyState: HotkeyState = .idle
 
     init(onDoubleTap: @escaping () -> Void) {
         self.onDoubleTap = onDoubleTap
@@ -37,37 +36,40 @@ class DoubleTapMonitor {
         }
     }
 
-    private func reset() {
-        lastReleaseTime = 0
-        isWaitingForSecondRelease = false
+    func reset() {
+        hotkeyState = .idle
     }
 
     private func handleFlagsChanged(_ event: NSEvent) {
         let currentFlags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
         let targetModifier = SettingsManager.shared.hotkeyModifier.modifierFlags
 
-        if currentFlags == targetModifier {
-            // Target modifier pressed (and it's the only one)
-            if !lastModifierFlags.contains(targetModifier) {
-                let currentTime = ProcessInfo.processInfo.systemUptime
-                if currentTime - lastReleaseTime < threshold {
-                    isWaitingForSecondRelease = true
-                }
+        switch hotkeyState {
+        case .idle:
+            if currentFlags == targetModifier {
+                hotkeyState = .firstPressed(firstPressedTime: ProcessInfo.processInfo.systemUptime)
+            } else if !currentFlags.isEmpty {
+                reset()
             }
-        } else if currentFlags.isEmpty {
-            // All modifiers released
-            if lastModifierFlags.contains(targetModifier) {
-                if isWaitingForSecondRelease {
-                    onDoubleTap()
-                    reset()
-                } else {
-                    lastReleaseTime = ProcessInfo.processInfo.systemUptime
-                }
+        case .firstPressed(let firstPressedTime):
+            if currentFlags == targetModifier {
+                hotkeyState = .secondPressed(firstPressedTime: firstPressedTime)
+            } else if !currentFlags.isEmpty {
+                reset()
             }
-        } else {
-            reset()
+        case .secondPressed(let firstPressedTime):
+            if currentFlags.isEmpty, ProcessInfo.processInfo.systemUptime - firstPressedTime < threshold {
+                onDoubleTap()
+                reset()
+            } else {
+                reset()
+            }
         }
-
-        lastModifierFlags = currentFlags
     }
+}
+
+enum HotkeyState {
+    case idle
+    case firstPressed(firstPressedTime: TimeInterval)
+    case secondPressed(firstPressedTime: TimeInterval)
 }
